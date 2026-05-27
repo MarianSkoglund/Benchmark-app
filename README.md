@@ -22,7 +22,7 @@ Metrics are data-driven by industry. For example, the Consulting industry includ
 - Customer satisfaction
 - Project delivery success
 
-The results page also includes an Excel export of the benchmark comparison.
+The results page includes status cards, a normalized progress chart, a color-coded benchmark table, and an Excel export of the benchmark comparison.
 
 ## Local Setup
 

@@ -1,6 +1,7 @@
-from pathlib import Path
 from io import BytesIO
+from pathlib import Path
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -40,6 +41,25 @@ INDUSTRY_METRIC_ORDER = {
         "project_delivery_success",
     ]
 }
+
+STATUS_COLORS = {
+    "Below market": "#d64545",
+    "Emerging": "#f2a93b",
+    "Competitive": "#2f80ed",
+    "Leading": "#1f9d55",
+}
+
+DISPLAY_COLUMNS = [
+    "Metric",
+    "Your value",
+    "Market median",
+    "Top quartile",
+    "Gap to median",
+    "Gap to top quartile",
+    "Progress to top quartile",
+    "Status",
+    "Recommended AI improvement lever",
+]
 
 
 @st.cache_data
@@ -83,6 +103,16 @@ def format_value(value: float, unit: str) -> str:
     return f"{value:,.1f}"
 
 
+def format_gap(value: float, unit: str) -> str:
+    if unit == "%":
+        return f"{value:+.1f} pp"
+    if unit == "$k/employee":
+        return f"{value:+,.0f}k / employee"
+    if unit in {"score 1-5", "score 1-10"}:
+        return f"{value:+.1f} points"
+    return f"{value:+,.1f}"
+
+
 def value_input_settings(metric: str, unit: str) -> dict:
     if unit == "score 1-5":
         return {"min_value": 0.0, "max_value": 5.0, "step": 0.1, "format": "%.1f"}
@@ -101,19 +131,33 @@ def build_result_rows(selected_rows: pd.DataFrame, user_values: dict[str, float]
         unit = benchmark["unit"]
         result = compare_to_benchmark(user_values[metric], benchmark)
         status = result["status"]
+        user_value = result["user_value"]
+        market_median = result["market_median"]
+        top_quartile = result["top_quartile"]
+        gap_to_median = user_value - market_median
+        gap_to_top_quartile = user_value - top_quartile
+        progress_to_top_quartile = (
+            (user_value / top_quartile) * 100 if top_quartile else 0
+        )
 
         result_rows.append(
             {
                 "Metric": metric_label(metric),
-                "Your value": format_value(result["user_value"], unit),
-                "Market median": format_value(result["market_median"], unit),
-                "Top quartile": format_value(result["top_quartile"], unit),
+                "Your value": format_value(user_value, unit),
+                "Market median": format_value(market_median, unit),
+                "Top quartile": format_value(top_quartile, unit),
+                "Gap to median": format_gap(gap_to_median, unit),
+                "Gap to top quartile": format_gap(gap_to_top_quartile, unit),
+                "Progress to top quartile": f"{progress_to_top_quartile:.0f}%",
                 "Status": status,
                 "Recommended AI improvement lever": get_recommendation(
                     metric=metric,
                     status=status,
                     industry=benchmark["industry"],
                 ),
+                "_progress_to_top_quartile": progress_to_top_quartile,
+                "_gap_to_top_quartile": gap_to_top_quartile,
+                "_status_color": STATUS_COLORS.get(status, "#6b7280"),
             }
         )
 
@@ -143,10 +187,83 @@ def build_excel_export(results_table: pd.DataFrame, industry: str, company_size:
         for sheet_name, worksheet in writer.sheets.items():
             worksheet.freeze_panes(1, 0)
             worksheet.set_column(0, 0, 24)
-            worksheet.set_column(1, 5, 20)
-            worksheet.set_column(6, 6, 72)
+            worksheet.set_column(1, 7, 20)
+            worksheet.set_column(8, 8, 72)
 
     return output.getvalue()
+
+
+def style_status(value: str) -> str:
+    color = STATUS_COLORS.get(value)
+    if not color:
+        return ""
+    return f"background-color: {color}; color: white; font-weight: 700"
+
+
+def render_status_cards(results_table: pd.DataFrame) -> None:
+    status_counts = results_table["Status"].value_counts().to_dict()
+    columns = st.columns(len(SCORE_ORDER))
+
+    for column, status in zip(columns, SCORE_ORDER):
+        count = status_counts.get(status, 0)
+        color = STATUS_COLORS[status]
+        column.markdown(
+            f"""
+            <div style="border-left: 6px solid {color}; padding: 0.75rem 0.9rem;
+                        background: #f8fafc; border-radius: 0.4rem;">
+                <div style="font-size: 0.82rem; color: #475569;">{status}</div>
+                <div style="font-size: 1.7rem; font-weight: 700; color: #0f172a;">
+                    {count}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def build_progress_chart(results_table: pd.DataFrame) -> alt.LayerChart:
+    chart_data = results_table[
+        ["Metric", "Status", "_progress_to_top_quartile", "_gap_to_top_quartile"]
+    ].rename(
+        columns={
+            "_progress_to_top_quartile": "Progress to top quartile (%)",
+            "_gap_to_top_quartile": "Gap to top quartile",
+        }
+    )
+
+    bars = (
+        alt.Chart(chart_data)
+        .mark_bar(cornerRadius=4)
+        .encode(
+            x=alt.X(
+                "Progress to top quartile (%):Q",
+                title="Progress to top quartile (%)",
+            ),
+            y=alt.Y("Metric:N", sort=None, title=None),
+            color=alt.Color(
+                "Status:N",
+                scale=alt.Scale(
+                    domain=list(STATUS_COLORS),
+                    range=list(STATUS_COLORS.values()),
+                ),
+                legend=alt.Legend(title="Status"),
+            ),
+            tooltip=[
+                "Metric:N",
+                "Status:N",
+                alt.Tooltip("Progress to top quartile (%):Q", format=".0f"),
+                alt.Tooltip("Gap to top quartile:Q", format=".1f"),
+            ],
+        )
+    )
+
+    top_quartile_rule = (
+        alt.Chart(pd.DataFrame({"Top quartile": [100]}))
+        .mark_rule(color="#111827", strokeDash=[4, 4])
+        .encode(x="Top quartile:Q")
+    )
+
+    return (bars + top_quartile_rule).properties(height=max(260, 34 * len(chart_data)))
 
 
 st.set_page_config(
@@ -229,7 +346,15 @@ if not submitted:
 st.subheader("Benchmark comparison")
 results = build_result_rows(selected_rows, user_values)
 results_table = pd.DataFrame(results)
-st.dataframe(results_table, use_container_width=True, hide_index=True)
+display_table = results_table[DISPLAY_COLUMNS]
+
+st.subheader("Performance overview")
+render_status_cards(results_table)
+st.altair_chart(build_progress_chart(results_table), width="stretch")
+
+st.subheader("Detailed benchmark table")
+styled_table = display_table.style.map(style_status, subset=["Status"])
+st.dataframe(styled_table, width="stretch", hide_index=True)
 
 st.subheader("Score guide")
 score_columns = st.columns(len(SCORE_ORDER))
@@ -246,7 +371,7 @@ file_safe_industry = industry.lower().replace(" ", "_")
 file_safe_size = company_size.replace("+", "plus").replace("-", "_")
 st.download_button(
     label="Download Excel report",
-    data=build_excel_export(results_table, industry, company_size),
+    data=build_excel_export(display_table, industry, company_size),
     file_name=f"ai_benchmark_{file_safe_industry}_{file_safe_size}.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
