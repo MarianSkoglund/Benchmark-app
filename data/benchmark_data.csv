@@ -1,0 +1,81 @@
+industry,company_size,metric,unit,p25,p50,p75
+Retail,1-50,margin,%,4,7,10
+Retail,1-50,productivity,$k/employee,120,180,240
+Retail,1-50,growth,%,2,6,11
+Retail,1-50,digital_maturity,score 1-5,1.5,2.3,3.1
+Retail,50-250,margin,%,5,8,12
+Retail,50-250,productivity,$k/employee,150,220,300
+Retail,50-250,growth,%,3,7,12
+Retail,50-250,digital_maturity,score 1-5,1.8,2.6,3.4
+Retail,250-1000,margin,%,6,9,13
+Retail,250-1000,productivity,$k/employee,180,260,340
+Retail,250-1000,growth,%,3,6,10
+Retail,250-1000,digital_maturity,score 1-5,2.1,3,3.7
+Retail,1000+,margin,%,7,10,14
+Retail,1000+,productivity,$k/employee,220,310,400
+Retail,1000+,growth,%,2,5,8
+Retail,1000+,digital_maturity,score 1-5,2.5,3.3,4
+Consulting,1-50,margin,%,12,18,25
+Consulting,1-50,productivity,$k/employee,130,190,280
+Consulting,1-50,growth,%,5,12,20
+Consulting,1-50,digital_maturity,score 1-5,1.7,2.5,3.4
+Consulting,50-250,margin,%,14,20,28
+Consulting,50-250,productivity,$k/employee,150,230,330
+Consulting,50-250,growth,%,6,11,18
+Consulting,50-250,digital_maturity,score 1-5,2,2.9,3.8
+Consulting,250-1000,margin,%,15,22,30
+Consulting,250-1000,productivity,$k/employee,170,260,360
+Consulting,250-1000,growth,%,5,10,16
+Consulting,250-1000,digital_maturity,score 1-5,2.3,3.2,4
+Consulting,1000+,margin,%,16,23,32
+Consulting,1000+,productivity,$k/employee,190,290,400
+Consulting,1000+,growth,%,4,8,13
+Consulting,1000+,digital_maturity,score 1-5,2.7,3.6,4.3
+Manufacturing,1-50,margin,%,5,9,14
+Manufacturing,1-50,productivity,$k/employee,110,160,220
+Manufacturing,1-50,growth,%,2,5,9
+Manufacturing,1-50,digital_maturity,score 1-5,1.3,2,2.9
+Manufacturing,50-250,margin,%,6,10,15
+Manufacturing,50-250,productivity,$k/employee,130,190,260
+Manufacturing,50-250,growth,%,2,5,8
+Manufacturing,50-250,digital_maturity,score 1-5,1.6,2.4,3.2
+Manufacturing,250-1000,margin,%,7,11,16
+Manufacturing,250-1000,productivity,$k/employee,160,230,310
+Manufacturing,250-1000,growth,%,2,4,7
+Manufacturing,250-1000,digital_maturity,score 1-5,2,2.8,3.6
+Manufacturing,1000+,margin,%,8,12,18
+Manufacturing,1000+,productivity,$k/employee,190,270,360
+Manufacturing,1000+,growth,%,1,4,6
+Manufacturing,1000+,digital_maturity,score 1-5,2.4,3.2,4
+SaaS,1-50,margin,%,8,15,25
+SaaS,1-50,productivity,$k/employee,100,160,240
+SaaS,1-50,growth,%,15,30,55
+SaaS,1-50,digital_maturity,score 1-5,2.2,3.2,4.1
+SaaS,50-250,margin,%,10,18,28
+SaaS,50-250,productivity,$k/employee,130,210,310
+SaaS,50-250,growth,%,12,25,45
+SaaS,50-250,digital_maturity,score 1-5,2.6,3.5,4.3
+SaaS,250-1000,margin,%,12,20,30
+SaaS,250-1000,productivity,$k/employee,160,250,360
+SaaS,250-1000,growth,%,10,20,35
+SaaS,250-1000,digital_maturity,score 1-5,3,3.8,4.5
+SaaS,1000+,margin,%,14,22,32
+SaaS,1000+,productivity,$k/employee,200,300,420
+SaaS,1000+,growth,%,8,16,28
+SaaS,1000+,digital_maturity,score 1-5,3.3,4,4.7
+Financial Services,1-50,margin,%,15,22,30
+Financial Services,1-50,productivity,$k/employee,180,260,360
+Financial Services,1-50,growth,%,4,9,16
+Financial Services,1-50,digital_maturity,score 1-5,2,3,3.9
+Financial Services,50-250,margin,%,17,24,32
+Financial Services,50-250,productivity,$k/employee,220,320,430
+Financial Services,50-250,growth,%,4,8,14
+Financial Services,50-250,digital_maturity,score 1-5,2.4,3.3,4.2
+Financial Services,250-1000,margin,%,18,26,35
+Financial Services,250-1000,productivity,$k/employee,260,380,500
+Financial Services,250-1000,growth,%,3,7,12
+Financial Services,250-1000,digital_maturity,score 1-5,2.8,3.6,4.4
+Financial Services,1000+,margin,%,20,28,38
+Financial Services,1000+,productivity,$k/employee,320,450,600
+Financial Services,1000+,growth,%,3,6,10
+Financial Services,1000+,digital_maturity,score 1-5,3.2,4,4.7
