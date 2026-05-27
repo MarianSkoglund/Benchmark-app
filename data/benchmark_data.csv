@@ -15,22 +15,38 @@ Retail,1000+,margin,%,7,10,14
 Retail,1000+,productivity,$k/employee,220,310,400
 Retail,1000+,growth,%,2,5,8
 Retail,1000+,digital_maturity,score 1-5,2.5,3.3,4
-Consulting,1-50,margin,%,12,18,25
-Consulting,1-50,productivity,$k/employee,130,190,280
+Consulting,1-50,utilization,%,62,70,78
+Consulting,1-50,revenue_per_employee,$k/employee,130,190,280
+Consulting,1-50,ebitda_margin,%,10,16,22
 Consulting,1-50,growth,%,5,12,20
-Consulting,1-50,digital_maturity,score 1-5,1.7,2.5,3.4
-Consulting,50-250,margin,%,14,20,28
-Consulting,50-250,productivity,$k/employee,150,230,330
+Consulting,1-50,employee_retention,%,75,84,90
+Consulting,1-50,ai_adoption,score 1-5,1.5,2.5,3.5
+Consulting,1-50,customer_satisfaction,score 1-10,6.5,7.6,8.6
+Consulting,1-50,project_delivery_success,%,65,78,88
+Consulting,50-250,utilization,%,66,74,82
+Consulting,50-250,revenue_per_employee,$k/employee,160,240,340
+Consulting,50-250,ebitda_margin,%,12,18,25
 Consulting,50-250,growth,%,6,11,18
-Consulting,50-250,digital_maturity,score 1-5,2,2.9,3.8
-Consulting,250-1000,margin,%,15,22,30
-Consulting,250-1000,productivity,$k/employee,170,260,360
+Consulting,50-250,employee_retention,%,78,86,92
+Consulting,50-250,ai_adoption,score 1-5,1.8,2.8,3.8
+Consulting,50-250,customer_satisfaction,score 1-10,6.8,7.8,8.8
+Consulting,50-250,project_delivery_success,%,70,82,90
+Consulting,250-1000,utilization,%,68,76,84
+Consulting,250-1000,revenue_per_employee,$k/employee,180,270,380
+Consulting,250-1000,ebitda_margin,%,13,20,27
 Consulting,250-1000,growth,%,5,10,16
-Consulting,250-1000,digital_maturity,score 1-5,2.3,3.2,4
-Consulting,1000+,margin,%,16,23,32
-Consulting,1000+,productivity,$k/employee,190,290,400
+Consulting,250-1000,employee_retention,%,80,87,93
+Consulting,250-1000,ai_adoption,score 1-5,2.2,3.2,4.1
+Consulting,250-1000,customer_satisfaction,score 1-10,7,8,9
+Consulting,250-1000,project_delivery_success,%,72,84,92
+Consulting,1000+,utilization,%,70,78,86
+Consulting,1000+,revenue_per_employee,$k/employee,210,310,430
+Consulting,1000+,ebitda_margin,%,14,21,29
 Consulting,1000+,growth,%,4,8,13
-Consulting,1000+,digital_maturity,score 1-5,2.7,3.6,4.3
+Consulting,1000+,employee_retention,%,82,88,94
+Consulting,1000+,ai_adoption,score 1-5,2.6,3.6,4.4
+Consulting,1000+,customer_satisfaction,score 1-10,7.2,8.2,9.1
+Consulting,1000+,project_delivery_success,%,74,86,93
 Manufacturing,1-50,margin,%,5,9,14
 Manufacturing,1-50,productivity,$k/employee,110,160,220
 Manufacturing,1-50,growth,%,2,5,9

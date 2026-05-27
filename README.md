@@ -1,6 +1,6 @@
 # AI Benchmarking Tool
 
-A Streamlit MVP for benchmarking company performance against sample market percentiles. Users select an industry, company size, and metrics, then enter their own values to compare against the market median and top quartile.
+A Streamlit MVP for benchmarking company performance against sample market percentiles. Users select an industry, company size, and relevant metrics, then enter their own values to compare against the market median and top quartile.
 
 ## What The App Benchmarks
 
@@ -10,6 +10,19 @@ A Streamlit MVP for benchmarking company performance against sample market perce
 - Digital maturity
 
 The first version uses sample benchmark data in `data/benchmark_data.csv`. No secrets, API keys, or paid services are required.
+
+Metrics are data-driven by industry. For example, the Consulting industry includes:
+
+- Utilization
+- Revenue per employee
+- EBITDA margin
+- Growth
+- Employee retention
+- AI adoption
+- Customer satisfaction
+- Project delivery success
+
+The results page also includes an Excel export of the benchmark comparison.
 
 ## Local Setup
 
@@ -57,6 +70,8 @@ The scoring logic assumes higher values are better for all included MVP metrics:
 - Competitive: value is from `p50` up to below `p75`
 - Leading: value is at or above `p75`
 
+To add or change industry-specific metrics, update `data/benchmark_data.csv` and add matching labels or recommendations in `app.py` and `src/recommendations.py` when needed.
+
 ## GitHub Setup
 
 1. Create a new GitHub repository.
@@ -88,6 +103,7 @@ data/benchmark_data.csv
 src/scoring.py
 src/recommendations.py
 tests/test_scoring.py
+tests/test_recommendations.py
 requirements.txt
 README.md
 ```

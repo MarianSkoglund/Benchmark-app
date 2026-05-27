@@ -1,4 +1,5 @@
 from pathlib import Path
+from io import BytesIO
 
 import pandas as pd
 import streamlit as st
@@ -10,13 +11,35 @@ from src.scoring import SCORE_ORDER, compare_to_benchmark
 DATA_PATH = Path(__file__).parent / "data" / "benchmark_data.csv"
 
 METRIC_LABELS = {
+    "utilization": "Utilization",
+    "revenue_per_employee": "Revenue per employee",
+    "ebitda_margin": "EBITDA margin",
     "margin": "Margin",
     "productivity": "Productivity",
     "growth": "Growth",
     "digital_maturity": "Digital maturity",
+    "employee_retention": "Employee retention",
+    "ai_adoption": "AI adoption",
+    "customer_satisfaction": "Customer satisfaction",
+    "project_delivery_success": "Project delivery success",
 }
 
 SIZE_ORDER = ["1-50", "50-250", "250-1000", "1000+"]
+
+DEFAULT_METRIC_ORDER = ["margin", "productivity", "growth", "digital_maturity"]
+
+INDUSTRY_METRIC_ORDER = {
+    "Consulting": [
+        "utilization",
+        "revenue_per_employee",
+        "ebitda_margin",
+        "growth",
+        "employee_retention",
+        "ai_adoption",
+        "customer_satisfaction",
+        "project_delivery_success",
+    ]
+}
 
 
 @st.cache_data
@@ -55,13 +78,17 @@ def format_value(value: float, unit: str) -> str:
         return f"${value:,.0f}k / employee"
     if unit == "score 1-5":
         return f"{value:.1f} / 5"
+    if unit == "score 1-10":
+        return f"{value:.1f} / 10"
     return f"{value:,.1f}"
 
 
-def value_input_settings(metric: str) -> dict:
-    if metric == "digital_maturity":
+def value_input_settings(metric: str, unit: str) -> dict:
+    if unit == "score 1-5":
         return {"min_value": 0.0, "max_value": 5.0, "step": 0.1, "format": "%.1f"}
-    if metric == "productivity":
+    if unit == "score 1-10":
+        return {"min_value": 0.0, "max_value": 10.0, "step": 0.1, "format": "%.1f"}
+    if unit == "$k/employee":
         return {"min_value": 0.0, "step": 10.0, "format": "%.0f"}
     return {"min_value": 0.0, "step": 0.5, "format": "%.1f"}
 
@@ -82,11 +109,44 @@ def build_result_rows(selected_rows: pd.DataFrame, user_values: dict[str, float]
                 "Market median": format_value(result["market_median"], unit),
                 "Top quartile": format_value(result["top_quartile"], unit),
                 "Status": status,
-                "Recommended AI improvement lever": get_recommendation(metric, status),
+                "Recommended AI improvement lever": get_recommendation(
+                    metric=metric,
+                    status=status,
+                    industry=benchmark["industry"],
+                ),
             }
         )
 
     return result_rows
+
+
+def metric_sort_key(industry: str, metric: str) -> int:
+    metric_order = INDUSTRY_METRIC_ORDER.get(industry, DEFAULT_METRIC_ORDER)
+    if metric in metric_order:
+        return metric_order.index(metric)
+    return len(metric_order)
+
+
+def build_excel_export(results_table: pd.DataFrame, industry: str, company_size: str) -> bytes:
+    output = BytesIO()
+    setup_table = pd.DataFrame(
+        {
+            "Field": ["Industry", "Company size"],
+            "Value": [industry, company_size],
+        }
+    )
+
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        setup_table.to_excel(writer, sheet_name="Setup", index=False)
+        results_table.to_excel(writer, sheet_name="Benchmark results", index=False)
+
+        for sheet_name, worksheet in writer.sheets.items():
+            worksheet.freeze_panes(1, 0)
+            worksheet.set_column(0, 0, 24)
+            worksheet.set_column(1, 5, 20)
+            worksheet.set_column(6, 6, 72)
+
+    return output.getvalue()
 
 
 st.set_page_config(
@@ -125,9 +185,7 @@ if filtered_data.empty:
 
 available_metrics = sorted(
     filtered_data["metric"].unique(),
-    key=lambda metric: list(METRIC_LABELS).index(metric)
-    if metric in METRIC_LABELS
-    else len(METRIC_LABELS),
+    key=lambda metric: metric_sort_key(industry, metric),
 )
 
 with st.sidebar:
@@ -159,7 +217,7 @@ with st.form("benchmark_form"):
             label,
             value=float(benchmark["p50"]),
             help=f"Market median is {format_value(float(benchmark['p50']), unit)}.",
-            **value_input_settings(metric),
+            **value_input_settings(metric, unit),
         )
 
     submitted = st.form_submit_button("Run benchmark", type="primary")
@@ -182,3 +240,13 @@ for column, status in zip(score_columns, SCORE_ORDER):
 st.subheader("Recommendations")
 for row in results:
     st.markdown(f"**{row['Metric']}:** {row['Recommended AI improvement lever']}")
+
+st.subheader("Export")
+file_safe_industry = industry.lower().replace(" ", "_")
+file_safe_size = company_size.replace("+", "plus").replace("-", "_")
+st.download_button(
+    label="Download Excel report",
+    data=build_excel_export(results_table, industry, company_size),
+    file_name=f"ai_benchmark_{file_safe_industry}_{file_safe_size}.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+)
